@@ -426,7 +426,7 @@ function simplifyLines(){
   //const table_buf = ["<table><tr><th>Algorithm</th><th>Time (ms)</th><th>Distance (m)</th><th>Error Max (m)</th><th>Error Avg. (m)</th><th>Error SD (m)</th></tr>"];
   //const table_buf = ["<table><tr><th>Algorithm</th><th>Time (ms)</th><th>Distance Error (m)</th><th>2D Position Error Max</th><th>2D Position Error Avg.</th><th>3D Position Error Max (m)</th><th>3D Position Error Avg. (m)</th></tr>"];
   const table_buf = ["<table><tr><th>Algorithm</th><th>Time (ms)</th><th>Points</th><th>Distance Error (m)</th><th>2D Position Error Max</th><th>2D Position Error Avg.</th></tr>"];
-  const loaded_lines_total_dist = loaded_lines.map(e => e[e.length - 1].dist).reduce((i, e) => i + e);
+  const loaded_lines_total_dist = loaded_lines.map(e => e.coords[e.coords.length - 1].dist).reduce((i, e) => i + e);
   
   for(const algo of reduce_algorithms){
     if(document.getElementById(algo.checkbox_id).checked){
@@ -437,11 +437,11 @@ function simplifyLines(){
       }else{
         console.time(algo.name);
         const t1 = performance.now();
-        const lines = loaded_lines.map(e => update_dists((algo.func)(e, reduced_points_count)));
+        const lines = loaded_lines.map(e => update_dists((algo.func)(e.coords, reduced_points_count)));
         const t2 = performance.now();
         console.timeEnd(algo.name);
         
-        const error_info = calc_errors(loaded_lines, lines);
+        const error_info = calc_errors(loaded_lines.map(e => e.coords), lines);
         result = {
           name: algo.name,
           time: (t2 - t1),
@@ -482,7 +482,13 @@ function douglasPeucker(coords, reduced_points_count){
     const bx = b.mercatorX;
     const by = b.mercatorY;
     const px = p.mercatorX;
-    const py = p.mercatorY;
+    const py = p.mercatorY;/*
+    const ax = a.lng;
+    const ay = a.lat;
+    const bx = b.lng;
+    const by = b.lat;
+    const px = p.lng;
+    const py = p.lat;*/
     
     let t = ((ax - bx) * (ax - px) + (ay - by) * (ay - py)) / ((ax - bx) * (ax - bx) + (ay - by) * (ay - by));
     if(t > 1){
@@ -1403,6 +1409,45 @@ class changableBinaryHeap {
 	}
 }
 
+/**
+ * loaded_linesを表示する
+ * @param {boolean} recalc_simplify_lines 間引いた線を再計算して表示する場合はtrue
+ */
+function drawLoadedLines(recalc_simplify_lines){
+  const colors = ["#000"];//["#3f3d9a", "#9a3d71", "#9a8c3d", "#3d9a56", "#3d5a9a", "#9a3d90", "#9a6d3d", "#439a3d", "#3d799a", "#843d9a", "#9a4e3d", "#629a3d"];
+  
+  let min_lat = Number.MAX_VALUE;
+  let min_lng = Number.MAX_VALUE;
+  let max_lat = -Number.MAX_VALUE;
+  let max_lng = -Number.MAX_VALUE;
+  
+  for(let i = 0; i < loaded_lines.length; i++){
+    const coords = loaded_lines[i].coords;
+    
+    googlemap.drawPolyline("gpx_lines", coords, colors[i % colors.length], 0.5, 10, 0, loaded_lines[i].name);
+    for(let j = 0; j < coords.length; j++){
+      if(coords[j].lat < min_lat) min_lat = coords[j].lat;
+      if(coords[j].lng < min_lng) min_lng = coords[j].lng;
+      if(coords[j].lat > max_lat) max_lat = coords[j].lat;
+      if(coords[j].lng > max_lng) max_lng = coords[j].lng;
+    }
+  }
+  
+  if(min_lat < Number.MAX_VALUE){
+    googlemap.map.fitBounds({
+      south: min_lat,
+      west: min_lng,
+      north: max_lat,
+      east: max_lng
+    });
+  }
+  
+  if(recalc_simplify_lines){
+    reduced_lines.clear();
+    simplifyLines();
+  }
+}
+
 window.addEventListener("DOMContentLoaded", function(){
   // GPX/TCX読み込み対応
   document.getElementById("gpx_file").addEventListener("change", async function(evt){
@@ -1412,12 +1457,6 @@ window.addEventListener("DOMContentLoaded", function(){
       googlemap.clearMap();
       loaded_lines.length = 0;
 
-      const colors = ["#000"];//["#3f3d9a", "#9a3d71", "#9a8c3d", "#3d9a56", "#3d5a9a", "#9a3d90", "#9a6d3d", "#439a3d", "#3d799a", "#843d9a", "#9a4e3d", "#629a3d"];
-      let min_lat = Number.MAX_VALUE;
-      let min_lng = Number.MAX_VALUE;
-      let max_lat = -Number.MAX_VALUE;
-      let max_lng = -Number.MAX_VALUE;
-      
       for(let i = 0; i < evt.target.files.length; i++){
         console.log(evt.target.files[i]);
         const xml = await readXML(evt.target.files[i]);
@@ -1430,31 +1469,15 @@ window.addEventListener("DOMContentLoaded", function(){
         }
         
         if(coords){
-          loaded_lines.push(coords);
-          
-          googlemap.drawPolyline("gpx_lines", coords, colors[i % colors.length], 0.5, 10, 0, evt.target.files[i].name);
-          
-          for(let i = 0; i < coords.length; i++){
-            if(coords[i].lat < min_lat) min_lat = coords[i].lat;
-            if(coords[i].lng < min_lng) min_lng = coords[i].lng;
-            if(coords[i].lat > max_lat) max_lat = coords[i].lat;
-            if(coords[i].lng > max_lng) max_lng = coords[i].lng;
-          }
+          loaded_lines.push({
+            coords: coords,
+            name: evt.target.files[i].name
+          });
         }
       }
       
-      if(min_lat < Number.MAX_VALUE){
-        googlemap.map.fitBounds({
-          south: min_lat,
-          west: min_lng,
-          north: max_lat,
-          east: max_lng
-        });
-      }
+      drawLoadedLines(true);
       
-      reduced_lines.clear();
-      simplifyLines();
-
     }catch(err){
       console.error(err);
 
@@ -1514,12 +1537,25 @@ window.addEventListener("DOMContentLoaded", function(){
       document.getElementById("gpx_file").dispatchEvent(evt);
     }, false)
   };
+  
+  // デモ用コースファイル読み込み
+  setTimeout((async function(){
+    const gpx = await fetch("route425.gpx");
+    const text = await gpx.text();
+    const parser = new DOMParser();
+    loaded_lines.push({
+      coords: parseGPX(parser.parseFromString(text, "text/xml")),
+      name: "国道425号"
+    });
+    
+    drawLoadedLines(true);
+  }), 1);
 });
 
 // 戻るボタンを押されたときにフォームの値が残っているとき
-window.addEventListener("pageshow", function(evt){
+/*window.addEventListener("pageshow", function(evt){
   document.getElementById("gpx_file").dispatchEvent(new Event("change"));
-});
+});*/
 
 function hideLoader(){
   document.getElementById("loader_bg").style.display = "none";
@@ -1832,9 +1868,9 @@ html, body {
   <option value="100">100</option>
   <option value="200">200</option>
   <option value="500">500</option>
-  <option value="1000">1000</option>
+  <option value="1000" selected>1000</option>
   <option value="2000">2000</option>
-  <option value="3000" selected>3000</option>
+  <option value="3000">3000</option>
   <option value="4000">4000</option>
   <option value="5000">5000</option>
   <option value="10000">10000</option>
