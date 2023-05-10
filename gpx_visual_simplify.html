@@ -18,7 +18,7 @@ const reduce_algorithms = [
   //{ checkbox_id: "checkbox_douglaspeucker3d",  name: "Douglas-Peucker(3D)", func: douglasPeucker3D,  color: "#800", zindex: 980, checked: "checked" },
   { checkbox_id: "checkbox_visvalingamwhyatt", name: "Visvalingam-Whyatt",  func: visvalingamWhyatt, color: "#00f", zindex: 890, checked: "checked" },
   //{ checkbox_id: "checkbox_visvalingamwhyatt3d", name: "Visvalingam-Whyatt(3D)",  func: visvalingamWhyatt, color: "#008", zindex: 680, checked: "checked" },
-  { checkbox_id: "checkbox_raumannwitkam",     name: "Reumann-Witkam",      func: ReumannWitkam,     color: "#ff0", zindex: 790, checked: "" },
+  { checkbox_id: "checkbox_raumannwitkam",     name: "Reumann-Witkam",      func: ReumannWitkam,     color: "#ff0", zindex: 790, checked: "checked" },
   { checkbox_id: "checkbox_lang",              name: "Lang",                func: Lang,              color: "#f80", zindex: 690, checked: "" },
   { checkbox_id: "checkbox_crosstrack",        name: "Cross-Track",         func: crossTrack,        color: "#0f0", zindex: 590, checked: "" },
   //{ checkbox_id: "checkbox_crosstrack3d",      name: "Cross-Track(3D)",     func: crossTrack,        color: "#080", zindex: 680, checked: "" },
@@ -1446,6 +1446,9 @@ function drawLoadedLines(recalc_simplify_lines){
     });
   }
   
+  const loaded_lines_total_points = loaded_lines.map(e => e.coords.length).reduce((i, e) => i + e);
+  document.getElementById("original_points").textContent = loaded_lines_total_points;
+  
   if(recalc_simplify_lines){
     reduced_lines.clear();
     simplifyLines();
@@ -1499,12 +1502,13 @@ window.addEventListener("DOMContentLoaded", function(){
   // アルゴリズムの一覧表を生成
   {
     const buf = [];
-    buf.push("<table><tr><th>Algorithm</th><th>Time (ms)</th><th>Points</th><th>Distance Error (m)</th><th>2D Position Error Max</th><th>2D Position Error Avg.</th></tr>");
+    buf.push("<table><tr><th>Algorithm</th><th>Points</th><th>Time (ms)</th><th>Distance Error (m)</th><th>2D Position Error Max</th><th>2D Position Error Avg.</th></tr>");
+    buf.push(`<tr><td><span style="color: #888;">■<\/span> Original<\/td><td id="original_points"><\/td><td>-<\/td><td>-<\/td><td>-<\/td><td>-<\/td><\/tr>`);
     for(const a of reduce_algorithms){
       buf.push(`<tr>`);
       buf.push(`<td><label><input id="${a.checkbox_id}" type="checkbox" ${a.checked}><span style="color: ${a.color};">■<\/span> ${a.name}<\/label><\/td>`);
-      buf.push(`<td id="${a.checkbox_id}_time"><\/td>`);
       buf.push(`<td id="${a.checkbox_id}_points"><\/td>`);
+      buf.push(`<td id="${a.checkbox_id}_time"><\/td>`);
       buf.push(`<td id="${a.checkbox_id}_distance_error"><\/td>`);
       buf.push(`<td id="${a.checkbox_id}_2d_position_error_max"><\/td>`);
       buf.push(`<td id="${a.checkbox_id}_2d_position_error_avg"><\/td>`);
@@ -1554,7 +1558,7 @@ window.addEventListener("DOMContentLoaded", function(){
   
   // デモ用コースファイル読み込み
   setTimeout((async function(){
-    const gpx = await fetch("route425.gpx");
+    const gpx = await fetch("demo_route_001.gpx");
     const text = await gpx.text();
     const parser = new DOMParser();
     loaded_lines.push({
@@ -1772,16 +1776,17 @@ html, body {
   width: 100%;
   background-color: #ddd;
   display: flex;
+  justify-content: center;
 }
 #flexbox_gpx_file {
-  flex: 5 5;
+  flex: 0 1 300px;
   height: 32px;
   min-width: 150px;
   box-sizing: border-box;
   padding: 2px;
 }
 #flexbox_reduced_points_count {
-  flex: 0 0 180px;
+  flex: 0 0 240px;
   height: 32px;
   box-sizing: border-box;
   padding: 2px;
@@ -1868,9 +1873,11 @@ html, body {
 <div id="flexbox_reduced_points_count">
  <label for="reduced_points_count">間引き後点数: <select id="reduced_points_count">
   <option value="100">100</option>
-  <option value="200">200</option>
+  <option value="200" selected>200</option>
+  <option value="300">300</option>
+  <option value="400">400</option>
   <option value="500">500</option>
-  <option value="1000" selected>1000</option>
+  <option value="1000">1000</option>
   <option value="2000">2000</option>
   <option value="3000">3000</option>
   <option value="4000">4000</option>
@@ -1878,7 +1885,9 @@ html, body {
   <option value="10000">10000</option>
   <option value="20000">20000</option>
   <option value="30000">30000</option>
+  <option value="40000">40000</option>
   <option value="50000">50000</option>
+  <option value="100000">100000</option>
  </select></label>
 </div>
 </div>
