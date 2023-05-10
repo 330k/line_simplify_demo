@@ -15,17 +15,17 @@ const loaded_lines = [];
 const reduced_lines = new Map();
 const reduce_algorithms = [
   { checkbox_id: "checkbox_douglaspeucker",    name: "Douglas-Peucker",     func: douglasPeucker,    color: "#f00", zindex: 990, checked: "checked" },
-  //{ checkbox_id: "checkbox_douglaspeucker3d",  name: "Douglas-Peucker(3D)", func: douglasPeucker3D,  color: "#800", zindex: 980, checked: "" },
+  //{ checkbox_id: "checkbox_douglaspeucker3d",  name: "Douglas-Peucker(3D)", func: douglasPeucker3D,  color: "#800", zindex: 980, checked: "checked" },
   { checkbox_id: "checkbox_visvalingamwhyatt", name: "Visvalingam-Whyatt",  func: visvalingamWhyatt, color: "#00f", zindex: 890, checked: "checked" },
   //{ checkbox_id: "checkbox_visvalingamwhyatt3d", name: "Visvalingam-Whyatt(3D)",  func: visvalingamWhyatt, color: "#008", zindex: 680, checked: "checked" },
-  { checkbox_id: "checkbox_raumannwitkam",     name: "Reumann-Witkam",      func: ReumannWitkam,     color: "#ff0", zindex: 790, checked: "checked" },
-  { checkbox_id: "checkbox_lang",              name: "Lang",                func: Lang,              color: "#f80", zindex: 690, checked: "checked" },
-  { checkbox_id: "checkbox_crosstrack",        name: "Cross-Track",         func: crossTrack,        color: "#0f0", zindex: 590, checked: "checked" },
-  //{ checkbox_id: "checkbox_crosstrack3d",      name: "Cross-Track(3D)",     func: crossTrack,        color: "#080", zindex: 680, checked: "checked" },
-  { checkbox_id: "checkbox_arclength",         name: "Arc-Length",          func: arcLength,         color: "#0ff", zindex: 590, checked: "checked" },
+  { checkbox_id: "checkbox_raumannwitkam",     name: "Reumann-Witkam",      func: ReumannWitkam,     color: "#ff0", zindex: 790, checked: "" },
+  { checkbox_id: "checkbox_lang",              name: "Lang",                func: Lang,              color: "#f80", zindex: 690, checked: "" },
+  { checkbox_id: "checkbox_crosstrack",        name: "Cross-Track",         func: crossTrack,        color: "#0f0", zindex: 590, checked: "" },
+  //{ checkbox_id: "checkbox_crosstrack3d",      name: "Cross-Track(3D)",     func: crossTrack,        color: "#080", zindex: 680, checked: "" },
+  { checkbox_id: "checkbox_arclength",         name: "Arc-Length",          func: arcLength,         color: "#0ff", zindex: 590, checked: "" },
   //{ checkbox_id: "checkbox_arclengthg",        name: "Arc-Length(G)",       func: arcLengthG,        color: "#0aa", zindex: 580, checked: "" },
-  //{ checkbox_id: "checkbox_kashmir3d",         name: "Kashmir3D",           func: kashmir3D,         color: "#f0f", zindex: 290, checked: "" },
-  //{ checkbox_id: "checkbox_nthpoint",          name: "Nth-Point",           func: nthPoint,          color: "#008", zindex: 190, checked: "checked" },
+  { checkbox_id: "checkbox_kashmir3d",         name: "Kashmir3D Emulate",   func: kashmir3D,         color: "#f0f", zindex: 290, checked: "" },
+  { checkbox_id: "checkbox_nthpoint",          name: "Nth-Point",           func: nthPoint,          color: "#008", zindex: 190, checked: "" },
 ];
 
 Promise.all([new Promise(function(resolve, reject){
