@@ -423,50 +423,46 @@ function simplifyLines(){
   }
   
   googlemap.deleteMapObjects("simplified_lines");
-  //const table_buf = ["<table><tr><th>Algorithm</th><th>Time (ms)</th><th>Distance (m)</th><th>Error Max (m)</th><th>Error Avg. (m)</th><th>Error SD (m)</th></tr>"];
-  //const table_buf = ["<table><tr><th>Algorithm</th><th>Time (ms)</th><th>Distance Error (m)</th><th>2D Position Error Max</th><th>2D Position Error Avg.</th><th>3D Position Error Max (m)</th><th>3D Position Error Avg. (m)</th></tr>"];
-  const table_buf = ["<table><tr><th>Algorithm</th><th>Time (ms)</th><th>Points</th><th>Distance Error (m)</th><th>2D Position Error Max</th><th>2D Position Error Avg.</th></tr>"];
   const loaded_lines_total_dist = loaded_lines.map(e => e.coords[e.coords.length - 1].dist).reduce((i, e) => i + e);
   
   for(const algo of reduce_algorithms){
-    if(document.getElementById(algo.checkbox_id).checked){
-      let result;
-      const key = algo.name + "-" + reduced_points_count;
-      if(reduced_lines.has(key)){
-        result = reduced_lines.get(key);
-      }else{
-        console.time(algo.name);
-        const t1 = performance.now();
-        const lines = loaded_lines.map(e => update_dists((algo.func)(e.coords, reduced_points_count)));
-        const t2 = performance.now();
-        console.timeEnd(algo.name);
-        
-        const error_info = calc_errors(loaded_lines.map(e => e.coords), lines);
-        result = {
-          name: algo.name,
-          time: (t2 - t1),
-          total_reduced_points: lines.map(e => e.length).reduce((i, e) => i + e),
-          total_dists: lines.map(e => e[e.length - 1].dist).reduce((i, e) => i + e),
-          lines: lines,
-          ...error_info
-        };
-        console.log(result);
-        reduced_lines.set(key, result);
-        
-      }
+    let result;
+    const key = algo.name + "-" + reduced_points_count;
+    if(reduced_lines.has(key)){
+      result = reduced_lines.get(key);
+    }else{
+      console.time(algo.name);
+      const t1 = performance.now();
+      const lines = loaded_lines.map(e => update_dists((algo.func)(e.coords, reduced_points_count)));
+      const t2 = performance.now();
+      console.timeEnd(algo.name);
       
+      const error_info = calc_errors(loaded_lines.map(e => e.coords), lines);
+      result = {
+        name: algo.name,
+        time: (t2 - t1),
+        total_reduced_points: lines.map(e => e.length).reduce((i, e) => i + e),
+        total_dists: lines.map(e => e[e.length - 1].dist).reduce((i, e) => i + e),
+        lines: lines,
+        ...error_info
+      };
+      console.log(result);
+      reduced_lines.set(key, result);
+      
+    }
+      
+    if(document.getElementById(algo.checkbox_id).checked){
       for(const l of result.lines){
         googlemap.drawPolyline("simplified_lines", l, algo.color, 1, 3, algo.zindex, algo.name);
       }
-      
-      //table_buf.push(`<tr><td>${result.name}<\/td><td>${result.time.toFixed(1)}<\/td><td>${result.total_dists.toFixed(3)} (${(result.total_dists - loaded_lines_total_dist).toFixed(3)})<\/td><td>${result.error_3d_max.toFixed(3)}<\/td><td>${result.error_3d_average.toFixed(3)}<\/td><td>${Math.sqrt(result.error_3d_deviation).toFixed(3)}<\/td><\/tr>`);
-      //table_buf.push(`<tr><td>${result.name}<\/td><td>${result.time.toFixed(1)}<\/td><td>${(result.total_dists - loaded_lines_total_dist).toFixed(3)}<\/td><td>${result.error_2d_max.toExponential(3)}<\/td><td>${result.error_2d_average.toExponential(3)}<\/td><td>${Math.sqrt(result.error_3d_max).toFixed(3)}<\/td><td>${Math.sqrt(result.error_3d_average).toFixed(3)}<\/td><\/tr>`);
-      table_buf.push(`<tr><td>${result.name}<\/td><td>${result.time.toFixed(1)}<\/td><td>${result.total_reduced_points}<\/td><td>${(result.total_dists - loaded_lines_total_dist).toFixed(3)}<\/td><td>${result.error_2d_max.toExponential(3)}<\/td><td>${result.error_2d_average.toExponential(3)}<\/td><\/tr>`);
     }
+    
+    document.getElementById(`${algo.checkbox_id}_time`).textContent = result.time.toFixed(1);
+    document.getElementById(`${algo.checkbox_id}_points`).textContent = result.total_reduced_points;
+    document.getElementById(`${algo.checkbox_id}_distance_error`).textContent = (result.total_dists - loaded_lines_total_dist).toFixed(3);
+    document.getElementById(`${algo.checkbox_id}_2d_position_error_max`).textContent = result.error_2d_max.toExponential(3);
+    document.getElementById(`${algo.checkbox_id}_2d_position_error_avg`).textContent = result.error_2d_average.toExponential(3);
   }
-  
-  table_buf.push("</table>");
-  document.getElementById("result_table").innerHTML = table_buf.join("\n");
 }
 
 /**
@@ -760,32 +756,36 @@ function ReumannWitkam(coords, reduced_points_count){
   let flags = [];
   let epsilon = 1e-5;
   
-  for(let k = 0; k < 100; k++){
-    flags = coords.map(e => false);
-    flags[0] = true;
-    flags[flags.length - 1] = true;
-    
-    let i = 0;
-    let j = 2;
-    while(j < coords.length){
-      if(linePointDistance2D(coords[i], coords[j], coords[i + 1]) > epsilon){
-        flags[j - 1] = true;
-        i = j - 1;
-        j = i + 2;
+  if(reduced_points_count < coords.length){
+    for(let k = 0; k < 100; k++){
+      flags = coords.map(e => false);
+      flags[0] = true;
+      flags[flags.length - 1] = true;
+      
+      let i = 0;
+      let j = 2;
+      while(j < coords.length){
+        if(linePointDistance2D(coords[i], coords[j], coords[i + 1]) > epsilon){
+          flags[j - 1] = true;
+          i = j - 1;
+          j = i + 2;
+        }else{
+          j = j + 1;
+        }
+      }
+      
+      let count = flags.filter(e => (e === true)).length;
+      console.log({epsilon, count});
+      if(count < 0.9 * reduced_points_count){
+        epsilon = epsilon * (count / reduced_points_count);
+      }else if(reduced_points_count < count){
+        epsilon = epsilon * Math.max((count / reduced_points_count), 1.01);
       }else{
-        j = j + 1;
+        break;
       }
     }
-    
-    let count = flags.filter(e => (e === true)).length;
-    console.log({epsilon, count});
-    if(count < 0.9 * reduced_points_count){
-      epsilon = epsilon * (count / reduced_points_count);
-    }else if(reduced_points_count < count){
-      epsilon = epsilon * Math.max((count / reduced_points_count), 1.01);
-    }else{
-      break;
-    }
+  }else{
+    flags = coords.map(e => true);
   }
   
   for(let i = 0; i < flags.length; i++){
@@ -827,39 +827,43 @@ function Lang(coords, reduced_points_count){
   const leap = Math.min(Math.floor(coords.length * 0.5), 10 * Math.ceil(coords.length / reduced_points_count));
   let epsilon = 1e-5;
   
-  for(let k = 0; k < 100; k++){
-    flags = coords.map(e => false);
-    flags[0] = true;
-    flags[flags.length - 1] = true;
-    
-    let i = 0;
-    let j = leap;
-    while(i < coords.length - 1){
-      for(j = Math.min(coords.length - 1, i + leap); j >= i + 1; j--){
-        let b = true;
-        for(let a = i + 1; a < j; a++){
-          if(linePointDistance2D(coords[i], coords[a], coords[j]) > epsilon){
-            b = false;
+  if(reduced_points_count < coords.length){
+    for(let k = 0; k < 100; k++){
+      flags = coords.map(e => false);
+      flags[0] = true;
+      flags[flags.length - 1] = true;
+      
+      let i = 0;
+      let j = leap;
+      while(i < coords.length - 1){
+        for(j = Math.min(coords.length - 1, i + leap); j >= i + 1; j--){
+          let b = true;
+          for(let a = i + 1; a < j; a++){
+            if(linePointDistance2D(coords[i], coords[a], coords[j]) > epsilon){
+              b = false;
+              break;
+            }
+          }
+          if(b){
             break;
           }
         }
-        if(b){
-          break;
-        }
+        flags[j] = true;
+        i = j;
       }
-      flags[j] = true;
-      i = j;
+      
+      let count = flags.filter(e => (e === true)).length;
+      console.log({leap, epsilon, count});
+      if(count < 0.9 * reduced_points_count){
+        epsilon = epsilon * (count / reduced_points_count);
+      }else if(reduced_points_count < count){
+        epsilon = epsilon * Math.max((count / reduced_points_count), 1.01);
+      }else{
+        break;
+      }
     }
-    
-    let count = flags.filter(e => (e === true)).length;
-    console.log({leap, epsilon, count});
-    if(count < 0.9 * reduced_points_count){
-      epsilon = epsilon * (count / reduced_points_count);
-    }else if(reduced_points_count < count){
-      epsilon = epsilon * Math.max((count / reduced_points_count), 1.01);
-    }else{
-      break;
-    }
+  }else{
+    flags = coords.map(e => true);
   }
   
   for(let i = 0; i < flags.length; i++){
@@ -1492,17 +1496,26 @@ window.addEventListener("DOMContentLoaded", function(){
     e.target.value = "";
   });
   
-  // アルゴリズムのチェックボックスを生成
+  // アルゴリズムの一覧表を生成
   {
-    const buf = []
+    const buf = [];
+    buf.push("<table><tr><th>Algorithm</th><th>Time (ms)</th><th>Points</th><th>Distance Error (m)</th><th>2D Position Error Max</th><th>2D Position Error Avg.</th></tr>");
     for(const a of reduce_algorithms){
-      buf.push(`<label><input id=\"${a.checkbox_id}\" type=\"checkbox\" ${a.checked}><span style=\"color: ${a.color};\">■</span> ${a.name}</label>`);
+      buf.push(`<tr>`);
+      buf.push(`<td><label><input id="${a.checkbox_id}" type="checkbox" ${a.checked}><span style="color: ${a.color};">■<\/span> ${a.name}<\/label><\/td>`);
+      buf.push(`<td id="${a.checkbox_id}_time"><\/td>`);
+      buf.push(`<td id="${a.checkbox_id}_points"><\/td>`);
+      buf.push(`<td id="${a.checkbox_id}_distance_error"><\/td>`);
+      buf.push(`<td id="${a.checkbox_id}_2d_position_error_max"><\/td>`);
+      buf.push(`<td id="${a.checkbox_id}_2d_position_error_avg"><\/td>`);
+      buf.push(`<\/tr>`);
     }
+    buf.push(`<\/table>`);
     
-    document.getElementById("algorithm_chekboxes").innerHTML = buf.join("");
+    document.getElementById("analysis_table").innerHTML = buf.join("");
   }
   
-  for(const n of document.querySelectorAll("#flexbox_algorithms input, #reduced_points_count")){
+  for(const n of document.querySelectorAll("#analysis_table input, #reduced_points_count")){
     n.addEventListener("change", function(){
       showLoader();
       setTimeout(function(){
@@ -1767,15 +1780,6 @@ html, body {
   box-sizing: border-box;
   padding: 2px;
 }
-#flexbox_algorithms {
-  /*flex: 0 0 250px;*/
-  height: 32px;
-  box-sizing: border-box;
-  padding: 2px;
-}
-#flexbox_algorithms label {
-  margin: 0 10px;
-}
 #flexbox_reduced_points_count {
   flex: 0 0 180px;
   height: 32px;
@@ -1783,16 +1787,16 @@ html, body {
   padding: 2px;
 }
 
-#result_table {
+#analysis_table {
   flex: 0 0 auto;
   text-align: center;
   background-color: #f8f8f8;
 }
-#result_table table {
+#analysis_table table {
   width: 100%;
   border-collapse: collapse;
 }
-#result_table table th, #result_table table td {
+#analysis_table table th, #analysis_table table td {
   border: 1px solid gray;
   text-align: center;
 }
@@ -1861,9 +1865,6 @@ html, body {
 <div id="wrapper">
 <div id="top_panel">
 <div id="flexbox_gpx_file"><input type="file" id="gpx_file" accept=".gpx,.tcx" multiple /></div>
-<div id="flexbox_algorithms">
- <span id="algorithm_chekboxes"></span>
-</div>
 <div id="flexbox_reduced_points_count">
  <label for="reduced_points_count">間引き後点数: <select id="reduced_points_count">
   <option value="100">100</option>
@@ -1881,7 +1882,7 @@ html, body {
  </select></label>
 </div>
 </div>
-<div id="result_table"></div>
+<div id="analysis_table"></div>
 <div id="map_canvas"></div>
 </div>
 </div>
