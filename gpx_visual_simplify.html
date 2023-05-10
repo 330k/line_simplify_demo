@@ -1453,31 +1453,32 @@ window.addEventListener("DOMContentLoaded", function(){
   document.getElementById("gpx_file").addEventListener("change", async function(evt){
     // GPX/TCXファイルの読み込み
     try{
-      showLoader();
-      googlemap.clearMap();
-      loaded_lines.length = 0;
+      if(evt.target.files.length > 0){
+        showLoader();
+        googlemap.clearMap();
+        loaded_lines.length = 0;
 
-      for(let i = 0; i < evt.target.files.length; i++){
-        console.log(evt.target.files[i]);
-        const xml = await readXML(evt.target.files[i]);
-        let coords = null;
-        if(evt.target.files[i].name.match(/\.gpx$/i)){
-          coords = parseGPX(xml);
-        }
-        if(evt.target.files[i].name.match(/\.tcx$/i)){
-          coords = parseTCX(xml);
+        for(let i = 0; i < evt.target.files.length; i++){
+          console.log(evt.target.files[i]);
+          const xml = await readXML(evt.target.files[i]);
+          let coords = null;
+          if(evt.target.files[i].name.match(/\.gpx$/i)){
+            coords = parseGPX(xml);
+          }
+          if(evt.target.files[i].name.match(/\.tcx$/i)){
+            coords = parseTCX(xml);
+          }
+          
+          if(coords){
+            loaded_lines.push({
+              coords: coords,
+              name: evt.target.files[i].name
+            });
+          }
         }
         
-        if(coords){
-          loaded_lines.push({
-            coords: coords,
-            name: evt.target.files[i].name
-          });
-        }
+        drawLoadedLines(true);
       }
-      
-      drawLoadedLines(true);
-      
     }catch(err){
       console.error(err);
 
@@ -1553,9 +1554,9 @@ window.addEventListener("DOMContentLoaded", function(){
 });
 
 // 戻るボタンを押されたときにフォームの値が残っているとき
-/*window.addEventListener("pageshow", function(evt){
+window.addEventListener("pageshow", function(evt){
   document.getElementById("gpx_file").dispatchEvent(new Event("change"));
-});*/
+});
 
 function hideLoader(){
   document.getElementById("loader_bg").style.display = "none";
