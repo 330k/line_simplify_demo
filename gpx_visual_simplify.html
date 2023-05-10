@@ -1694,11 +1694,11 @@ class GoogleMapManager {
           map: googlemap.map
         });
       }
-
+      
       dist_info.innerHTML = title + ": " + (0.001 * coords[index_min].dist).toFixed(3) + " km";
       dist_info.style.display = "block";
-      dist_info.style.left = evt.domEvent.pageX - dist_info.clientWidth * 0.5;
-      dist_info.style.top = evt.domEvent.pageY - dist_info.clientHeight - 20;
+      dist_info.style.left = (evt.domEvent.pageX - dist_info.clientWidth * 0.5) + "px";
+      dist_info.style.top = (evt.domEvent.pageY - dist_info.clientHeight - 20) + "px";
 
     });
     line_transparent.addListener("mouseout", function(evt){
