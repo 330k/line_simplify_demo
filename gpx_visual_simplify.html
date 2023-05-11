@@ -826,7 +826,7 @@ function ReumannWitkam(coords, reduced_points_count){
 function Lang(coords, reduced_points_count){
   const result = [];
   let flags = [];
-  const leap = Math.min(Math.floor(coords.length * 0.5), 10 * Math.ceil(coords.length / reduced_points_count));
+  const leap = Math.min(1000, 10 * Math.ceil(coords.length / reduced_points_count));
   let epsilon = 1e-5;
   
   if(reduced_points_count < coords.length){
