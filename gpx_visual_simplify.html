@@ -1504,11 +1504,12 @@ window.addEventListener("DOMContentLoaded", function(){
   // アルゴリズムの一覧表を生成
   {
     const buf = [];
-    buf.push("<table><tr><th>Algorithm</th><th>Points</th><th>Time (ms)</th><th>Distance Error (m)</th><th>2D Position Error Max</th><th>2D Position Error Avg.</th></tr>");
-    buf.push(`<tr><td><span style="color: #888;">■<\/span> Original<\/td><td id="original_points"><\/td><td>-<\/td><td>-<\/td><td>-<\/td><td>-<\/td><\/tr>`);
+    buf.push("<table><tr><th></th><th>Algorithm</th><th>Points</th><th>Time (ms)</th><th>Distance Error (m)</th><th>2D Position Error Max</th><th>2D Position Error Avg.</th></tr>");
+    buf.push(`<tr><td><\/td><td><span style="color: #888;">■<\/span> Original<\/td><td id="original_points"><\/td><td>-<\/td><td>-<\/td><td>-<\/td><td>-<\/td><\/tr>`);
     for(const a of reduce_algorithms){
       buf.push(`<tr>`);
-      buf.push(`<td><label><input id="${a.checkbox_id}" type="checkbox" ${a.checked}><span style="color: ${a.color};">■<\/span> ${a.name}<\/label><\/td>`);
+      buf.push(`<td><input id="${a.checkbox_id}" type="checkbox" ${a.checked}><\/td>`);
+      buf.push(`<td><label for="${a.checkbox_id}"><span style="color: ${a.color};">■<\/span> ${a.name}<\/label><\/td>`);
       buf.push(`<td id="${a.checkbox_id}_points"><\/td>`);
       buf.push(`<td id="${a.checkbox_id}_time"><\/td>`);
       buf.push(`<td id="${a.checkbox_id}_distance_error"><\/td>`);
