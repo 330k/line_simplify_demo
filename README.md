@@ -23,6 +23,7 @@ https://330k.github.io/line_simplify_demo/gpx_visual_simplify.html
   * https://www.gpsbabel.org/htmldoc-development/filter_simplify.html
 * Kashimir3D-Emulate
   * A Bottom-Up approach that eliminates the point with minimum distance
+  * This is not a perfect emulation of Kashmir3D (Kashmir3D's algorithm is somehow differenct from release note)
 * Nth-Point
   * Simply keep n-th points
   * https://psimpl.sourceforge.net/nth-point.html 
