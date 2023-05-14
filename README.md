@@ -17,5 +17,10 @@ https://330k.github.io/line_simplify_demo/gpx_visual_simplify.html
   * https://psimpl.sourceforge.net/lang.html
 * Cross-Track
   * A Bottom-Up approach that eliminates the point with minimum perpendicular distance 
+  * https://www.gpsbabel.org/htmldoc-development/filter_simplify.html
 * Arc-Length
   * A Bottom-Up approach that eliminates the point with minimum geodesic distance decrease
+  * https://www.gpsbabel.org/htmldoc-development/filter_simplify.html
+* Nth-Point
+  * Simply keep n-th points
+  * https://psimpl.sourceforge.net/nth-point.html 
