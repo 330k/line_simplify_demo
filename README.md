@@ -21,6 +21,8 @@ https://330k.github.io/line_simplify_demo/gpx_visual_simplify.html
 * Arc-Length
   * A Bottom-Up approach that eliminates the point with minimum geodesic distance decrease
   * https://www.gpsbabel.org/htmldoc-development/filter_simplify.html
+* Kashimir3D-Emulate
+  * A Bottom-Up approach that eliminates the point with minimum distance
 * Nth-Point
   * Simply keep n-th points
   * https://psimpl.sourceforge.net/nth-point.html 
