@@ -53,7 +53,7 @@ function initMap(){
  * @param {number} lon2
  * @return {number} distance [m]
  */
- const hubeny = (function(){
+const hubeny = (function(){
   const a = 6378137.0;
   const f = 1 / 298.257223563;
   const e2 = f * (2 - f);
@@ -63,7 +63,7 @@ function initMap(){
   const sqrt = Math.sqrt;
   return function (lat1, lon1, lat2, lon2){
     const latdiff = (lat1 - lat2) * degree;
-    const londiff = (lon1 - lon2) * degree;
+    const londiff = (((lon1 - lon2 + 180) % 360) - 180) * degree;
     const latave = 0.5 * (lat1 + lat2) * degree;
     const sinlatave = sin(latave);
     const coslatave = cos(latave);
@@ -1569,13 +1569,13 @@ window.addEventListener("pageshow", function(evt){
 });
 
 // デモルートを読み込む
-async function loadDemoRoute(demo_url = "demo_route_003.gpx"){
+async function loadDemoRoute(demo_url = "demo_route_003.gpx", title = "Demo Route"){
   const gpx = await fetch(demo_url);
   const text = await gpx.text();
   const parser = new DOMParser();
   loaded_lines.push({
     coords: parseGPX(parser.parseFromString(text, "text/xml")),
-    name: "Demo Route"
+    name: title
   });
   
   drawLoadedLines(true);
