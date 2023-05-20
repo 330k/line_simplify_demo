@@ -259,7 +259,7 @@ function addRouteInformation(coords){
     
     coords[i].dist = d;
     coords[i].mercatorX = lng * degree;
-    coords[i].mercatorY = Math.asinh(Math.tanh(lat * degree));
+    coords[i].mercatorY = Math.asinh(Math.tan(lat * degree));
     coords[i].X = XYZ.X;
     coords[i].Y = XYZ.Y;
     coords[i].Z = XYZ.Z;
@@ -1573,6 +1573,10 @@ async function loadDemoRoute(demo_url = "demo_route_003.gpx", title = "Demo Rout
   const gpx = await fetch(demo_url);
   const text = await gpx.text();
   const parser = new DOMParser();
+  
+  googlemap.clearMap();
+  loaded_lines.length = 0;
+  
   loaded_lines.push({
     coords: parseGPX(parser.parseFromString(text, "text/xml")),
     name: title
