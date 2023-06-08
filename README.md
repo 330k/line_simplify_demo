@@ -8,9 +8,10 @@ https://330k.github.io/line_simplify_demo/gpx_visual_simplify.html
 
 * (Ramor-)Douglas-Peucker
   * A Top-Down approarch that minimize maximum perpendicular distance
-  * https://psimpl.sourceforge.net/douglas-peucker.html
+  * https://en.wikipedia.org/wiki/Ramer%E2%80%93Douglas%E2%80%93Peucker_algorithm
 * Visvalingam-Whyatt
   * A Bottom-Up approach that eliminates the point with minimum adjacent triangle area
+  * https://en.wikipedia.org/wiki/Visvalingam%E2%80%93Whyatt_algorithm
 * Reumann-Witkam
   * https://psimpl.sourceforge.net/reumann-witkam.html
 * Lang
