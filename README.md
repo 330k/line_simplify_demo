@@ -22,6 +22,8 @@ https://330k.github.io/line_simplify_demo/gpx_visual_simplify.html
 * Arc-Length
   * A Bottom-Up approach that eliminates the point with minimum geodesic distance decrease
   * https://www.gpsbabel.org/htmldoc-development/filter_simplify.html
+* Largest Triangle Three Buckets
+  * https://dev.to/crate/advanced-downsampling-with-the-lttb-algorithm-3okh
 * Kashimir3D-Emulate
   * A Bottom-Up approach that eliminates the point with minimum distance
   * This is not a perfect emulation of Kashmir3D (Kashmir3D's algorithm is somehow differenct from [release note](https://www.kashmir3d.com/kash/kashnews.html#894))
