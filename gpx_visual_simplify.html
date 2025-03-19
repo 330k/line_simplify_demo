@@ -26,6 +26,7 @@ const reduce_algorithms = [
   //{ checkbox_id: "checkbox_crosstrack3d",      name: "Cross-Track(3D)",     func: crossTrack,        color: "#080", zindex: 680, checked: "" },
   { checkbox_id: "checkbox_arclength",         name: "Arc-Length",          func: arcLength,         color: "#0ff", zindex: 590, checked: "" },
   //{ checkbox_id: "checkbox_arclengthg",        name: "Arc-Length(G)",       func: arcLengthG,        color: "#0aa", zindex: 580, checked: "" },
+  { checkbox_id: "checkbox_lttb",              name: "LTTB",                func: largestTriangleThreeBuckets, color: "#0aa", zindex: 580, checked: "" },
   { checkbox_id: "checkbox_kashmir3d",         name: "Kashmir3D Emulate",   func: kashmir3D,         color: "#f0f", zindex: 290, checked: "" },
   { checkbox_id: "checkbox_nthpoint",          name: "Nth-Point",           func: nthPoint,          color: "#008", zindex: 190, checked: "" },
 ];
@@ -470,7 +471,7 @@ function simplifyLines(){
 /**
  * Douglas-Peucker(2D)で線分を簡略化
  * @param {[{lat:number,lng:number}]} coords
- * @param {int} reduced_points_count 削減後の要素数
+ * @param {number} reduced_points_count 削減後の要素数
  * @return {[{lat:number,lng:number}]} 削減後のcoords
  */
 function douglasPeucker(coords, reduced_points_count){
@@ -506,7 +507,7 @@ function douglasPeucker(coords, reduced_points_count){
 /**
  * Douglas-Peucker(3D)で線分を簡略化
  * @param {[{lat:number,lng:number}]} coords
- * @param {int} reduced_points_count 削減後の要素数
+ * @param {number} reduced_points_count 削減後の要素数
  * @return {[{lat:number,lng:number}]} 削減後のcoords
  */
 function douglasPeucker3D(coords, reduced_points_count){
@@ -541,7 +542,7 @@ function douglasPeucker3D(coords, reduced_points_count){
 /**
  * Douglas-Peuckerにおいて、線分との距離ではなく減少する距離を使う(arclengthを大域的に行う)
  * @param {[{lat:number,lng:number}]} coords
- * @param {int} reduced_points_count 削減後の要素数
+ * @param {number} reduced_points_count 削減後の要素数
  * @return {[{lat:number,lng:number}]} 削減後のcoords
  */
 function arcLengthG(coords, reduced_points_count){
@@ -553,7 +554,7 @@ function arcLengthG(coords, reduced_points_count){
 /**
  * Cross-Track(GPSBabelのデフォルト)で線分を簡略化
  * @param {[{lat:number,lng:number}]} coords
- * @param {int} reduced_points_count 削減後の要素数
+ * @param {number} reduced_points_count 削減後の要素数
  * @return {[{lat:number,lng:number}]} 削減後のcoords
  */
 function crossTrack(coords, reduced_points_count){
@@ -584,7 +585,7 @@ function crossTrack(coords, reduced_points_count){
 /**
  * Cross-Track(3D)で線分を簡略化
  * @param {[{lat:number,lng:number}]} coords
- * @param {int} reduced_points_count 削減後の要素数
+ * @param {number} reduced_points_count 削減後の要素数
  * @return {[{lat:number,lng:number}]} 削減後のcoords
  */
 function crossTrack3D(coords, reduced_points_count){
@@ -621,7 +622,7 @@ function crossTrack3D(coords, reduced_points_count){
 /**
  * Arc-Length(GPSBabelのarclengthエミュレート、距離の差が小さくなる点を削除)で線分を簡略化
  * @param {[{lat:number,lng:number}]} coords
- * @param {int} reduced_points_count 削減後の要素数
+ * @param {number} reduced_points_count 削減後の要素数
  * @return {[{lat:number,lng:number}]} 削減後のcoords
  */
 function arcLength(coords, reduced_points_count){
@@ -635,7 +636,7 @@ function arcLength(coords, reduced_points_count){
 /**
  * Visvalingam-Whyattで線分を簡略化
  * @param {[{lat:number,lng:number}]} coords
- * @param {int} reduced_points_count 削減後の要素数
+ * @param {number} reduced_points_count 削減後の要素数
  * @return {[{lat:number,lng:number}]} 削減後のcoords
  */
 function visvalingamWhyatt(coords, reduced_points_count){
@@ -655,7 +656,7 @@ function visvalingamWhyatt(coords, reduced_points_count){
 /**
  * Visvalingam-Whyatt3Dで線分を簡略化
  * @param {[{lat:number,lng:number}]} coords
- * @param {int} reduced_points_count 削減後の要素数
+ * @param {number} reduced_points_count 削減後の要素数
  * @return {[{lat:number,lng:number}]} 削減後のcoords
  */
 function visvalingamWhyatt3D(coords, reduced_points_count){
@@ -681,7 +682,7 @@ function visvalingamWhyatt3D(coords, reduced_points_count){
  *   距離が最も短い線分の両端の点のうち、他方への距離が短いほうを削除している?
  *   前後の点の距離の合計が短いほうを削除している?
  * @param {[{lat:number,lng:number}]} coords
- * @param {int} reduced_points_count 削減後の要素数
+ * @param {number} reduced_points_count 削減後の要素数
  * @return {[{lat:number,lng:number}]} 削減後のcoords
  */
 function kashmir3D(coords, reduced_points_count){
@@ -750,7 +751,7 @@ function kashmir3D(coords, reduced_points_count){
  * Reumann-Witkamで線分を簡略化
  * 削減後の点数を指定できないので、閾値を変化させながら探索
  * @param {[{lat:number,lng:number}]} coords
- * @param {int} reduced_points_count 削減後の要素数
+ * @param {number} reduced_points_count 削減後の要素数
  * @return {[{lat:number,lng:number}]} 削減後のcoords
  */
 function ReumannWitkam(coords, reduced_points_count){
@@ -820,7 +821,7 @@ function ReumannWitkam(coords, reduced_points_count){
  * Langで線分を簡略化
  * 削減後の点数を指定できないので、閾値を変化させながら探索
  * @param {[{lat:number,lng:number}]} coords
- * @param {int} reduced_points_count 削減後の要素数
+ * @param {number} reduced_points_count 削減後の要素数
  * @return {[{lat:number,lng:number}]} 削減後のcoords
  */
 function Lang(coords, reduced_points_count){
@@ -897,7 +898,7 @@ function Lang(coords, reduced_points_count){
 /**
  * Nth-Pointで線分を簡略化
  * @param {[{lat:number,lng:number}]} coords
- * @param {int} reduced_points_count 削減後の要素数
+ * @param {number} reduced_points_count 削減後の要素数
  * @return {[{lat:number,lng:number}]} 削減後のcoords
  */
 function nthPoint(coords, reduced_points_count){
@@ -916,9 +917,82 @@ function nthPoint(coords, reduced_points_count){
 }
 
 /**
+ * Largest Triangle Three Buckets(LTTB)
+ * from: https://github.com/sveinn-steinarsson/flot-downsample/blob/master/jquery.flot.downsample.js
+ * @param {[{lat:number,lng:number}]} coords
+ * @param {number} reduced_points_count 削減後の要素数
+ * @return {[{lat:number,lng:number}]} 削減後のcoords
+ */
+function largestTriangleThreeBuckets(coords, reduced_points_count) {
+  const coords_length = coords.length;
+  if (reduced_points_count >= coords_length || reduced_points_count === 0) {
+    return coords; // Nothing to do
+  }
+
+  const sampled = [];
+  let sampled_index = 0;
+
+  // Bucket size. Leave room for start and end coords points
+  const every = (coords_length - 2) / (reduced_points_count - 2);
+
+  let a = 0;  // Initially a is the first point in the triangle
+  let max_area_point;
+  let max_area;
+  let area;
+  let next_a;
+
+  sampled[sampled_index++] = coords[a]; // Always add the first point
+
+  for(let i = 0; i < reduced_points_count - 2; i++) {
+    // Calculate point average for next bucket (containing c)
+    let avg_x = 0;
+    let avg_y = 0;
+    let avg_range_start  = Math.floor( ( i + 1 ) * every ) + 1;
+    let avg_range_end    = Math.floor( ( i + 2 ) * every ) + 1;
+    avg_range_end = avg_range_end < coords_length ? avg_range_end : coords_length;
+
+    let avg_range_length = avg_range_end - avg_range_start;
+
+    for( ; avg_range_start < avg_range_end; avg_range_start++ ) {
+      avg_x += coords[ avg_range_start ].mercatorX;
+      avg_y += coords[ avg_range_start ].mercatorY;
+    }
+    avg_x /= avg_range_length;
+    avg_y /= avg_range_length;
+
+    // Get the range for this bucket
+    let range_offs = Math.floor( (i + 0) * every ) + 1;
+    let range_to   = Math.floor( (i + 1) * every ) + 1;
+
+    // Point a
+    let point_a_x = coords[ a ].mercatorX;
+    let point_a_y = coords[ a ].mercatorY;
+
+    max_area = area = -1;
+
+    for ( ; range_offs < range_to; range_offs++ ) {
+      // Calculate triangle area over three buckets
+      area = Math.abs( ( point_a_x - avg_x ) * ( coords[ range_offs ].mercatorY - point_a_y ) - ( point_a_x - coords[ range_offs ].mercatorX ) * ( avg_y - point_a_y ) ) * 0.5;
+      if ( area > max_area ) {
+        max_area = area;
+        max_area_point = coords[ range_offs ];
+        next_a = range_offs; // Next a is this b
+      }
+    }
+
+    sampled[ sampled_index++ ] = max_area_point; // Pick this point from the bucket
+    a = next_a; // This a is the next a (chosen b)
+  }
+
+  sampled[ sampled_index++ ] = coords[ coords_length - 1 ]; // Always add last
+
+  return sampled;
+}
+
+/**
  * 一般化した線分を簡略化(大域的に残す点を選ぶ)
  * @param {[{lat:number,lng:number}]} coords
- * @param {int} reduced_points_count 削減後の要素数
+ * @param {number} reduced_points_count 削減後の要素数
  * @param {Function} priority_func 優先度関数(DPにおける距離関数)
  * @return {[{lat:number,lng:number}]} 削減後のcoords
  */
@@ -988,7 +1062,7 @@ function globallyResidualSelection(coords, reduced_points_count, priority_func){
 /**
  * 一般化した線分簡略化関数(局所的に削除点を選ぶ)
  * @param {[{lat:number,lng:number}]} coords
- * @param {int} reduced_points_count 削減後の要素数
+ * @param {number} reduced_points_count 削減後の要素数
  * @param {Function} priority_func 優先度関数(DPにおける距離関数)
  * @return {[{lat:number,lng:number}]} 削減後のcoords
  */
@@ -1130,9 +1204,9 @@ class deletablePriorityQueue {
     }
   }
   
-	enqueue(priority, value){
+  enqueue(priority, value){
     this._queue.enqueue(priority, value);
-	}
+  }
   
   dequeue(){
     let result = this._queue.dequeue();
@@ -1163,92 +1237,92 @@ class deletablePriorityQueue {
 // 最小d-aryヒープ(dequeue時に優先度も一緒に返す)
 function d_ary_heap_min(d){
   "use strict";
-	const _d = d || 4;
-	const _data = [];
-	let _size = 0;
-	const _dinv = 1 / _d;
-	const enqueue = function(priority, value){
-		const data = _data;
-		
-		if(_size){
-			data.push({p: priority, v: value});
-			let i = _size;
-			let p = ~~((i - 1) * _dinv);
-			while(p >= 0){
-				if(data[p].p > data[i].p){
-					const ret = data[i];
-					data[i] = data[p];
-					data[p] = ret;
-				
-					i = p;
-					p = ~~((i - 1) * _dinv);
-				}else{
-					break;
-				}
-			}
-		}else{
-			data.push({p: priority, v: value});
-		}
-		_size = _size + 1;
-	};
-	const dequeue = function(){
-		const data = _data;
-		const size = _size - 1;
-		let i = 0;
-		let c = 1;
-		
-		if(_size){
-			const result = data[0];
-			data[0] = data[size];
-			data.pop();
-			
-			while(c < size){
-				const p0 = data[i].p;
-				let pmax = data[c].p;
-				let cmax = c;
-				
-				let jmax = c + _d;
-				if(jmax > size){
-					jmax = size;
-				}
-				for(let j = c + 1; j < jmax; j++){
-					let pret = data[j].p;
-					if(pmax > pret){
-						pmax = pret;
-						cmax = j;
-					}
-				}
-				if(p0 > pmax){
-					let ret = data[i];
-					data[i] = data[cmax];
-					data[cmax] = ret;
-				}else{
-					break;
-				}
-				i = cmax;
-				c = i * _d + 1;
-			}
-			
-			_size = size;
-			return result;
-		}else{
-			return (void 0);
-		}
-	};
-	const top = function(){
-		return _data[0];
-	};
-	const size = function(){
-		return _size;
-	};
-	
-	return {
-		name: "d-ary Heap (d=" + _d + ")",
-		enqueue: enqueue,
-		dequeue: dequeue,
-		top: top,
-		size: size
-	};
+  const _d = d || 4;
+  const _data = [];
+  let _size = 0;
+  const _dinv = 1 / _d;
+  const enqueue = function(priority, value){
+    const data = _data;
+
+    if(_size){
+      data.push({p: priority, v: value});
+      let i = _size;
+      let p = ~~((i - 1) * _dinv);
+      while(p >= 0){
+        if(data[p].p > data[i].p){
+          const ret = data[i];
+          data[i] = data[p];
+          data[p] = ret;
+
+          i = p;
+          p = ~~((i - 1) * _dinv);
+        }else{
+          break;
+        }
+      }
+    }else{
+      data.push({p: priority, v: value});
+    }
+    _size = _size + 1;
+  };
+  const dequeue = function(){
+    const data = _data;
+    const size = _size - 1;
+    let i = 0;
+    let c = 1;
+
+    if(_size){
+      const result = data[0];
+      data[0] = data[size];
+      data.pop();
+
+      while(c < size){
+        const p0 = data[i].p;
+        let pmax = data[c].p;
+        let cmax = c;
+
+        let jmax = c + _d;
+        if(jmax > size){
+          jmax = size;
+        }
+        for(let j = c + 1; j < jmax; j++){
+          let pret = data[j].p;
+          if(pmax > pret){
+            pmax = pret;
+            cmax = j;
+          }
+        }
+        if(p0 > pmax){
+          let ret = data[i];
+          data[i] = data[cmax];
+          data[cmax] = ret;
+        }else{
+          break;
+        }
+        i = cmax;
+        c = i * _d + 1;
+      }
+
+      _size = size;
+      return result;
+    }else{
+      return (void 0);
+    }
+  };
+  const top = function(){
+    return _data[0];
+  };
+  const size = function(){
+    return _size;
+  };
+
+  return {
+    name: "d-ary Heap (d=" + _d + ")",
+    enqueue: enqueue,
+    dequeue: dequeue,
+    top: top,
+    size: size
+  };
 }
 
 // 優先度変更操作を可能にした最小BinaryHeap
@@ -1262,87 +1336,87 @@ class changableBinaryHeap {
     }
   }
   
-	enqueue(priority, value){
-		const data = this._data;
-		
-		if(this._size){
-			data.push({p: priority, v: value});
-			let i = this._size;
-			let p = (i - 1) >> 1;	// parent
-			while(p >= 0){
-				if(data[p].p > data[i].p){
-					const ret = data[i];
-					data[i] = data[p];
-					data[p] = ret;
-				
-					i = p;
-					p = (i - 1) >> 1;//Math.floor((i - 1) * 0.5);
-				}else{
-					break;
-				}
-			}
-		}else{
-			data.push({p: priority, v: value});
-		}
-		this._size = this._size + 1;
-	}
+  enqueue(priority, value){
+    const data = this._data;
+
+    if(this._size){
+      data.push({p: priority, v: value});
+      let i = this._size;
+      let p = (i - 1) >> 1;  // parent
+      while(p >= 0){
+        if(data[p].p > data[i].p){
+          const ret = data[i];
+          data[i] = data[p];
+          data[p] = ret;
+
+          i = p;
+          p = (i - 1) >> 1;//Math.floor((i - 1) * 0.5);
+        }else{
+          break;
+        }
+      }
+    }else{
+      data.push({p: priority, v: value});
+    }
+    this._size = this._size + 1;
+  }
   
   dequeue(){
-		const data = this._data;
-		const size = this._size - 1;
-		
-		if(this._size){
-			const result = data[0];
-			data[0] = data[size];
-			data.pop();
-			let i = 0;
-			let c1 = 1;	// left child
-			let c2 = 2;	// right child
-			
-			while(c1 < size){
-				if(c2 < size){
-					const p0 = data[i].p;
-					const p1 = data[c1].p;
-					const p2 = data[c2].p;
-				
-					if((p1 > p2) && (p0 > p2)){
-						const ret = data[i];
-						data[i] = data[c2];
-						data[c2] = ret;
-						i = c2;
-					}else if(p0 > p1){
-						const ret = data[i];
-						data[i] = data[c1];
-						data[c1] = ret;
-						i = c1;
-					}else{
-						break;
-					}
-					c1 = (i << 1) + 1;
-					c2 = (i << 1) + 2;
-				}else{
-					const p0 = data[i].p;
-					const p1 = data[c1].p;
-					
-					if(p0 > p1){
-						const ret = data[i];
-						data[i] = data[c1];
-						data[c1] = ret;
-					}
-					break;
-				}
-			}
-			
-			this._size = size;
-			return result.v;
-		}else{
-			return (void 0);
-		}
-	}
+    const data = this._data;
+    const size = this._size - 1;
+
+    if(this._size){
+      const result = data[0];
+      data[0] = data[size];
+      data.pop();
+      let i = 0;
+      let c1 = 1;  // left child
+      let c2 = 2;  // right child
+
+      while(c1 < size){
+        if(c2 < size){
+          const p0 = data[i].p;
+          const p1 = data[c1].p;
+          const p2 = data[c2].p;
+
+          if((p1 > p2) && (p0 > p2)){
+            const ret = data[i];
+            data[i] = data[c2];
+            data[c2] = ret;
+            i = c2;
+          }else if(p0 > p1){
+            const ret = data[i];
+            data[i] = data[c1];
+            data[c1] = ret;
+            i = c1;
+          }else{
+            break;
+          }
+          c1 = (i << 1) + 1;
+          c2 = (i << 1) + 2;
+        }else{
+          const p0 = data[i].p;
+          const p1 = data[c1].p;
+
+          if(p0 > p1){
+            const ret = data[i];
+            data[i] = data[c1];
+            data[c1] = ret;
+          }
+          break;
+        }
+      }
+
+      this._size = size;
+      return result.v;
+    }else{
+      return (void 0);
+    }
+  }
   
-	top(){
-		return this._data[0].v;
-	}
+  top(){
+    return this._data[0].v;
+  }
   
   changepriority(newpriority, value){
     const data = this._data;
@@ -1352,8 +1426,8 @@ class changableBinaryHeap {
         if(data[i].p < newpriority){
           // 下に向かってヒープ構造を維持する
           data[i].p = newpriority;
-					let c1 = (i << 1) + 1;
-					let c2 = (i << 1) + 2;
+          let c1 = (i << 1) + 1;
+          let c2 = (i << 1) + 2;
           
           while(c1 < this._size){
             if(c2 < this._size){
@@ -1391,7 +1465,7 @@ class changableBinaryHeap {
         }else{
           // 上に向かってヒープ構造を維持する
           data[i].p = newpriority;
-          let p = (i - 1) >> 1;	// parent
+          let p = (i - 1) >> 1;  // parent
           while(p >= 0){
             if(data[p].p > data[i].p){
               const ret = data[i];
@@ -1410,9 +1484,9 @@ class changableBinaryHeap {
       }
     }
   }
-	size(){
-		return this._size;
-	}
+  size(){
+    return this._size;
+  }
 }
 
 /**
